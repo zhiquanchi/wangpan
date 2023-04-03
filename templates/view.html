@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>File List</title>
+</head>
+<body>
+    <h1>File List</h1>
+    <ul id="dirs"></ul>
+    <ul id="files"></ul>
+    <script>
+        // 使用 AJAX 获取数据，并使用 JavaScript 渲染页面
+        fetch('/').then(response => response.json())
+            .then(data => {
+                data.dirs.forEach(dir => {
+                    document.getElementById('dirs').innerHTML += '<li>' + dir + '</li>';
+                });
+                data.files.forEach(file => {
+                    document.getElementById('files').innerHTML += '<li>' + file + '</li>';
+                });
+            })
+            .catch(error => console.error(error));
+    </script>
+</body>
+</html>

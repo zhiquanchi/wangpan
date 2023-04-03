@@ -6,6 +6,26 @@
 </head>
 <body>
     <h1>Welcome, {{ username }}</h1>
-    <a href="/logout">Log Out</a>
+    <!-- <a href="/logout">Log Out</a> -->
+    <a href="/create">Create a new post</a>
+    <ul>
+        {% for post in posts %}
+            <li>
+                <a href="/post/{{ post.id }}">{{ post.title }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+
+
+    <div title='upload'>
+        <h1>Upload</h1>
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="filename">
+            <input type="submit" value="Upload">
+        </form>
+    </div>
+    
+
+
 </body>
 </html>
