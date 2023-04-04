@@ -1,5 +1,11 @@
 from flask import Flask, request, render_template, redirect, session
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_httpauth import HTTPBasicAuth
+import pymysql
+
+# 连接数据库
+
+
 
 app = Flask(__name__)
 app.secret_key = 'mysecretkey'
@@ -7,6 +13,8 @@ app.secret_key = 'mysecretkey'
 users = {}
 
 folders = '/folders/'
+
+auth = HTTPBasicAuth()
 
 @app.route('/')
 def index():
@@ -18,6 +26,13 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+
+        # 从数据中获取用户信息
+        # user = User.query.filter_by(username=username).first()
+        # if user:
+        #     return render_template('register.html', message='该用户名已被注册')
+
+
         if not username or not password:
             return render_template('register.html', message='请填写完整信息')
         if username in users:
@@ -45,6 +60,7 @@ def login():
 
 #主页
 @app.route('/dashboard')
+@auth.login_required
 def dashboard():
     if 'username' not in session:
         return redirect('/')
@@ -56,104 +72,12 @@ def logout():
     session.pop('username', None)
     return redirect('/')
 
-#创建文件夹
-@app.route('/create', methods=['GET', 'POST'])
-def create():
-    if 'username' not in session:
-        return redirect('/')
-    if request.method == 'POST':
-        foldername = request.form['foldername']
-        if not foldername:
-            return render_template('create.html', message='请填写完整信息')
-        if foldername in folders:
-            return render_template('create.html', message='该文件夹已存在')
-        folders[foldername] = []
-        return redirect('/dashboard')
-    return render_template('create.html')
-
-#删除文件夹
-@app.route('/delete', methods=['GET', 'POST'])
-def delete():
-    if 'username' not in session:
-        return redirect('/')
-    if request.method == 'POST':
-        foldername = request.form['foldername']
-        if not foldername:
-            return render_template('delete.html', message='请填写完整信息')
-        if foldername not in folders:
-            return render_template('delete.html', message='该文件夹不存在')
-        folders.pop(foldername)
-        return redirect('/dashboard')
-    return render_template('delete.html')
-
-#上传文件
-@app.route('/upload', methods=['GET', 'POST'])
-def upload():
-    if 'username' not in session:
-        return redirect('/')
-    if request.method == 'POST':
-        foldername = request.form['foldername']
-        filename = request.form['filename']
-        if not foldername or not filename:
-            return render_template('upload.html', message='请填写完整信息')
-        if foldername not in folders:
-            return render_template('upload.html', message='该文件夹不存在')
-        folders[foldername].append(filename)
-        return redirect('/dashboard')
-    return render_template('upload.html')
-
-#下载文件
-@app.route('/download', methods=['GET', 'POST'])
-def download():
-    if 'username' not in session:
-        return redirect('/')
-    if request.method == 'POST':
-        foldername = request.form['foldername']
-        filename = request.form['filename']
-        if not foldername or not filename:
-            return render_template('download.html', message='请填写完整信息')
-        if foldername not in folders:
-            return render_template('download.html', message='该文件夹不存在')
-        if filename not in folders[foldername]:
-            return render_template('download.html', message='该文件不存在')
-        return render_template('download.html', message='下载成功')
-    return render_template('download.html')
-
-#删除文件
-@app.route('/deletefile', methods=['GET', 'POST'])
-def deletefile():
-    if 'username' not in session:
-        return redirect('/')
-    if request.method == 'POST':
-        foldername = request.form['foldername']
-        filename = request.form['filename']
-        if not foldername or not filename:
-            return render_template('deletefile.html', message='请填写完整信息')
-        if foldername not in folders:
-            return render_template('deletefile.html', message='该文件夹不存在')
-        if filename not in folders[foldername]:
-            return render_template('deletefile.html', message='该文件不存在')
-        folders[foldername].remove(filename)
-        return redirect('/dashboard')
-    return render_template('deletefile.html')
-
-#查看文件
-@app.route('/view', methods=['GET', 'POST'])
-def view():
-    if 'username' not in session:
-        return redirect('/')
-    if request.method == 'POST':
-        foldername = request.form['foldername']
-        filename = request.form['filename']
-        if not foldername or not filename:
-            return render_template('view.html', message='请填写完整信息')
-        if foldername not in folders:
-            return render_template('view.html', message='该文件夹不存在')
-        if filename not in folders[foldername]:
-            return render_template('view.html', message='该文件不存在')
-        return render_template('view.html', message='查看成功')
-    return render_template('view.html')
-
+#验证
+@auth.verify_password
+def verify_password(username, password):
+    if username in users:
+        return check_password_hash(users.get(username), password)
+    return False
 
 
 if __name__ == '__main__':

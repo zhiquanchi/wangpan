@@ -4,27 +4,39 @@
     <meta charset="UTF-8">
     <title>Dashboard</title>
 </head>
+
+<style>
+    #logout {
+        flex: 1;
+        float: right;
+        /* 上面留空 */
+        padding-top: 20px;
+        /* 右邊留空 */
+        padding-right: 40px;
+    }
+    #filelist {
+        /* 水平居中 */
+        position: absolute;
+        left: 50%;
+
+    }
+
+</style>
 <body>
-    <h1>Welcome, {{ username }}</h1>
-    <!-- <a href="/logout">Log Out</a> -->
-    <a href="/create">Create a new post</a>
-    <ul>
-        {% for post in posts %}
-            <li>
-                <a href="/post/{{ post.id }}">{{ post.title }}</a>
-            </li>
-        {% endfor %}
-    </ul>
-
-
-    <div title='upload'>
-        <h1>Upload</h1>
-        <form action="/upload" method="post" enctype="multipart/form-data">
-            <input type="file" name="filename">
-            <input type="submit" value="Upload">
-        </form>
+    <div id="logout">
+        当前登录用户为:{{ username }}
+    <a href="/logout">Log Out</a>
     </div>
     
+
+    <div id="filelist">
+        <h1>File List</h1>
+        <ul>
+            {% for file in files %}
+                <li><a href="/file/{{ file }}">{{ file }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
 
 
 </body>
