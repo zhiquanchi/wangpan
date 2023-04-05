@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网盘系统</title>
+</head>
+
+
+<style>
+    #logout {
+        text-align: right;
+    }
+    
+    
+    #filelist table {
+        border-collapse: collapse;
+        width: 80%;
+        margin: 0 auto;
+    }
+    #filelist table th {
+        border: 1px solid #000;
+        padding: 5px;
+        text-align: center;
+    }
+    #filelist table td {
+        border: 1px solid #000;
+        padding: 5px;
+    }
+    #upload {
+         /* 水平居中 */
+        width: 400px;
+        margin: 0 auto;
+    }
+</style>
+<body>
+    <div id="logout">
+        当前登录用户为:{{ username }}
+        <button onclick="location.href='/logout'">Log Out</button>
+
+    <div id="filelist">
+        <div id="文件列表">
+        <h1>文件列表</h1>
+        </div>
+        <table>
+            <tr>
+                <th>文件名</th>
+                <!-- <th>文件大小</th>
+                <th>上传时间</th> -->
+                <th style="width:100px;">操作</th>
+            </tr>
+            {% for file in files %}
+            <tr>
+                <!-- 居中 -->
+                <td style="text-align:center;">{{ file.filename }}</td>
+                <!-- <td>{{ file.filesize }}</td>
+                <td>{{ file.uploadtime }}</td> -->
+                <td>
+                    <button onclick="location.href='/download/{{ file.filename }}'">下载</button>
+                    <button onclick="location.href='/delete/{{ file.filename }}'">删除</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <!-- 上传文件 -->
+    <div id="upload">
+        <h1>上传文件</h1>
+        <form method="post" action="/upload" enctype="multipart/form-data">
+            <input type="file" name="file">
+            <input type="submit" value="上传">
+        </form>
+
+</body>
+</html>
