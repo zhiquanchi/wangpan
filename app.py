@@ -114,16 +114,18 @@ def upload():
     # 获取上传的文件
     file = request.files['file']
     if request.method == 'POST':
+        # 当文件为空时，返回错误
+        if file.filename == '':
+            return redirect('/login')
         # 将文件存入数据库
         # 获取文件的保存路径，并将路径保存到数据库中
         filepath = folders + file.filename
-        cousor.execute('insert into file values(%s, %s, %s,%s)', (auth.username(),file.filename, filepath,123 ))
+        cousor.execute('insert into file values(%s, %s, %s)', (auth.username(),file.filename, filepath))
         db_netdisk.commit()
         # 将文件存入文件夹
         file.save(filepath)
-        return render_template('home.html',username = auth.username(), files = file.filename, message='上传成功')
-    redirect('/')
-    return render_template('home.html',username = auth.username(), files = file.filename, message='上传失败')
+        return redirect('/login')
+    return redirect('/login')
         
 # 下载文件
 @app.route('/download/<filename>')
@@ -163,15 +165,19 @@ def createfolder():
     # 创建文件夹
     if request.method == 'POST':
         foldername = request.form['foldername']
+        # 当名字为空是返回错误
+        if not foldername:
+            return redirect('/login')
+        
         # 将文件夹存入数据库
         cousor.execute('insert into folder values(%s, %s)', (auth.username(), foldername))
         db_netdisk.commit()
         # 创建文件夹
         os.mkdir(folders + foldername)
-        redirect('/')
-        return render_template('home.html',username = auth.username(), message='创建成功')
-    redirect('/')
-    return render_template('home.html',username = auth.username(), message='创建失败')
+        return redirect('/login')
+        # return render_template('home.html',username = auth.username(), message='创建成功')
+    return redirect('/login')
+    # return render_template('home.html',username = auth.username(), message='创建失败')
 
 # 删除文件夹
 @app.route('/deletefolder/<foldername>')
@@ -183,8 +189,8 @@ def deletefolder(foldername):
     # 删除数据库中的文件夹
     cousor.execute('delete from folder where username = %s and foldername = %s', (auth.username(), foldername))
     db_netdisk.commit()
-    redirect('/')
-    return render_template('home.html',username = auth.username(), message='删除成功')
+    return redirect('/login')
+    # return render_template('home.html',username = auth.username(), message='删除成功')
 
 
 
