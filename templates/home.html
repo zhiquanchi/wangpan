@@ -13,7 +13,10 @@
         text-align: right;
     }
     
-    
+    h1{
+        text-align: center;
+    }
+
     #filelist table {
         border-collapse: collapse;
         width: 80%;
@@ -38,6 +41,37 @@
     <div id="logout">
         当前登录用户为:{{ username }}
         <button onclick="location.href='/logout'">Log Out</button>
+    </div>
+
+    <div id="foldes">
+        <div id="文件夹">
+        <h1>文件夹</h1>
+        </div>
+        <div id="文件夹列表">
+        <table>
+            <tr>
+                <th>文件夹名</th>
+                <th style="width:100px;">操作</th>
+            </tr>
+            {% for folder in folders %}
+            <tr>
+                <!-- 居中 -->
+                <td style="text-align:center;">{{ folder.foldername }}</td>
+                <td>
+                    <button onclick="location.href='/deletefolder/{{ folder.foldername }}'">删除</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        </div>
+        <div id="新建文件夹">
+        <form method="post" action="/createfolder">
+            <input type="text" name="foldername">
+            <input type="submit" value="新建文件夹">
+        </form>
+        {{ message }}
+        </div>
+    </div>
 
     <div id="filelist">
         <div id="文件列表">
@@ -63,6 +97,9 @@
             </tr>
             {% endfor %}
         </table>
+        {{ message }}
+    </div>
+        
     </div>
     <!-- 上传文件 -->
     <div id="upload">

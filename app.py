@@ -95,8 +95,14 @@ def home():
     for i in files:
         items = {'filename':i[1], 'filepath':i[2]}
         fileslist.append(items)
-    
-    return render_template('home.html',files = fileslist)
+    # 获取文件夹列表
+    cousor.execute('select * from folder where username = %s',(auth.username(),))
+    folders = cousor.fetchall()
+    folderslist = []
+    for i in folders:
+        items = {'foldername':i[1]}
+        folderslist.append(items)
+    return render_template('home.html', username = auth.username(), files = fileslist, folders = folderslist)
         
 # 上传文件
 @app.route('/upload', methods=['GET', 'POST'])
@@ -111,7 +117,7 @@ def upload():
         # 将文件存入数据库
         # 获取文件的保存路径，并将路径保存到数据库中
         filepath = folders + file.filename
-        cousor.execute('insert into file values(%s, %s, %s,%s)', (auth.username(),file.filename, filepath,None ))
+        cousor.execute('insert into file values(%s, %s, %s,%s)', (auth.username(),file.filename, filepath,123 ))
         db_netdisk.commit()
         # 将文件存入文件夹
         file.save(filepath)
@@ -149,6 +155,37 @@ def delete(filename):
     os.remove(folders + filename)
     redirect(request.url)
     return render_template('home.html',username = auth.username(), files = files, message='删除成功')
+
+# 新建文件夹
+@app.route('/createfolder', methods=['GET', 'POST'])
+@auth.login_required
+def createfolder():
+    # 创建文件夹
+    if request.method == 'POST':
+        foldername = request.form['foldername']
+        # 将文件夹存入数据库
+        cousor.execute('insert into folder values(%s, %s)', (auth.username(), foldername))
+        db_netdisk.commit()
+        # 创建文件夹
+        os.mkdir(folders + foldername)
+        redirect('/')
+        return render_template('home.html',username = auth.username(), message='创建成功')
+    redirect('/')
+    return render_template('home.html',username = auth.username(), message='创建失败')
+
+# 删除文件夹
+@app.route('/deletefolder/<foldername>')
+@auth.login_required
+def deletefolder(foldername):
+    # 删除文件夹
+    import shutil
+    shutil.rmtree(folders + foldername)
+    # 删除数据库中的文件夹
+    cousor.execute('delete from folder where username = %s and foldername = %s', (auth.username(), foldername))
+    db_netdisk.commit()
+    redirect('/')
+    return render_template('home.html',username = auth.username(), message='删除成功')
+
 
 
 if __name__ == '__main__':
