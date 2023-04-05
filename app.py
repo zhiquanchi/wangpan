@@ -111,7 +111,7 @@ def upload():
         # 将文件存入数据库
         # 获取文件的保存路径，并将路径保存到数据库中
         filepath = folders + file.filename
-        cousor.execute('insert into file values(%s, %s, %s)', (auth.username(),file.filename, filepath, ))
+        cousor.execute('insert into file values(%s, %s, %s,%s)', (auth.username(),file.filename, filepath,None ))
         db_netdisk.commit()
         # 将文件存入文件夹
         file.save(filepath)
