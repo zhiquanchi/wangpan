@@ -80,9 +80,18 @@ def register():
 
 # logout
 @app.route('/logout')
-@auth.login_required
 def logout():
-    return redirect('/')
+    return redirect('/'), 401
+    # # 删除用户认证信息并删除session
+    # response = make_response("Successfully logged out")
+    # response.set_cookie("username", "", expires=0)
+    # response.headers['www-authenticate'] = 'Basic realm="Login Required"'
+    # # response删除所有用户信息
+    # response.delete_cookie('username')
+    # response.delete_session('username')
+    # # response = redirect('/')
+    # return response
+
 
 # 登录
 @app.route('/login')
