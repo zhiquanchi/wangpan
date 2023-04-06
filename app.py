@@ -155,8 +155,7 @@ def delete(filename):
     # 将文件从文件夹中删除
     import os
     os.remove(folders + filename)
-    redirect(request.url)
-    return render_template('home.html',username = auth.username(), files = files, message='删除成功')
+    return redirect('/login')
 
 # 新建文件夹
 @app.route('/createfolder', methods=['GET', 'POST'])
